@@ -1,0 +1,12 @@
+{
+  "name": "purescript-oboe",
+  "version": "0.0.1",
+  "description": "PureScript wrapper around oboe.js",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "oboe": "~1.15.1",
+    "purescript-http": "~0.1.1",
+    "purescript-either": "~0.1.2"
+  }
+}
