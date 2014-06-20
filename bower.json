@@ -7,6 +7,7 @@
   "dependencies": {
     "oboe": "~1.15.1",
     "purescript-http": "~0.1.1",
-    "purescript-either": "~0.1.2"
+    "purescript-either": "~0.1.2",
+    "purescript-exceptions": "~0.1.0"
   }
 }

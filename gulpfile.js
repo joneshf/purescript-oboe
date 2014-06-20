@@ -16,15 +16,23 @@ var paths = {
 
 var options = {};
 
-gulp.task('compile', function() {
-    var pscMake = purescript.pscMake(options);
-    pscMake.on('error', function(e) {
+var compile = function(compiler) {
+    var psc = compiler(options);
+    psc.on('error', function(e) {
         console.error(e.message);
-        pscMake.end();
+        psc.end();
     });
     return gulp.src([paths.src].concat(paths.bowerSrc))
-        .pipe(pscMake)
+        .pipe(psc)
         .pipe(gulp.dest(paths.dest));
+};
+
+gulp.task('make', function() {
+    return compile(purescript.pscMake);
+});
+
+gulp.task('browser', function() {
+    return compile(purescript.psc);
 });
 
 gulp.task('docs', function() {
@@ -33,8 +41,12 @@ gulp.task('docs', function() {
       .pipe(gulp.dest(paths.docsDest));
 });
 
-gulp.task('watch', function() {
-    gulp.watch(paths.src, ['compile', 'docs']);
+gulp.task('watch-browser', function() {
+    gulp.watch(paths.src, ['browser', 'docs']);
 });
 
-gulp.task('default', ['compile', 'docs', 'watch']);
+gulp.task('watch-make', function() {
+    gulp.watch(paths.src, ['make', 'docs']);
+});
+
+gulp.task('default', ['make', 'docs']);
