@@ -22,7 +22,7 @@
 
     done :: forall eff result. Oboe -> (JSON -> Eff eff result) -> Eff (oboe :: OboeEff | eff) Oboe
 
-    fail :: forall eff e r result. Oboe -> ({ jsonBody :: JSON, body :: String, statusCode :: Number, thrown :: Eff (err :: Exception e | eff) result } -> Eff eff result) -> Eff (oboe :: OboeEff | eff) Oboe
+    fail :: forall eff e r result. Oboe -> ({ jsonBody :: JSON, body :: String, statusCode :: Number, thrown :: Eff (err :: Exception | eff) result } -> Eff eff result) -> Eff (oboe :: OboeEff | eff) Oboe
 
     node :: forall eff r result. Oboe -> String -> (JSON -> [String] -> [{  | r }] -> Eff eff result) -> Eff (oboe :: OboeEff | eff) Oboe
 

@@ -13,13 +13,12 @@ module Network.Oboe
   , fail
   ) where
 
-  import Control.Monad.Eff
-  import Control.Monad.Eff.Exception
+  import Control.Monad.Eff (Eff())
+  import Control.Monad.Eff.Exception (Exception())
 
-  import Data.Either
-  import Data.Function
+  import Data.Function (Fn3(), runFn3)
 
-  import Network.HTTP
+  import Network.HTTP (Header(..), Verb(..))
 
   foreign import data OboeEff :: !
   foreign import data Oboe :: *
@@ -100,7 +99,7 @@ module Network.Oboe
     \  }\
     \}" :: forall eff e r result
         .  Oboe
-        ->  ( { thrown :: Eff (err :: Exception e | eff) result
+        ->  ( { thrown :: Eff (err :: Exception | eff) result
               , statusCode :: Number
               , body :: String
               , jsonBody :: JSON
@@ -110,30 +109,35 @@ module Network.Oboe
         -> Eff (oboe :: OboeEff | eff) Oboe
 
   foreign import oboe_
-    "var oboe_;\
-    \try {\
-    \  oboe_ = require('oboe');\
-    \} catch (e) {\
-    \  oboe_ = window.oboe;\
-    \}" :: Oboe
-
-  foreign import oboe
-    "function oboe(obj) {\
+    "function oboe_(header2Obj, showVerb, obj) {\
     \  return function() {\
-    \      var headers = {};\
-    \      obj.headers.map(header2Obj).forEach(function(header) {\
-    \        headers[header.head] = header.value;\
-    \      });\
-    \      return oboe_({\
-    \        url: obj.url,\
-    \        method: showVerb(obj.method),\
-    \        headers: headers,\
-    \        body: obj.body,\
-    \        cached: obj.cached,\
-    \        withCredentials: obj.withCredentials\
-    \      });\
+    \    var oboe__;\
+    \    try {\
+    \      oboe__ = require('oboe');\
+    \    } catch (e) {\
+    \      oboe__ = window.oboe;\
+    \    }\
+    \    var headers = {};\
+    \    obj.headers.map(header2Obj).forEach(function(header) {\
+    \      headers[header.head] = header.value;\
+    \    });\
+    \    return oboe__({\
+    \      url: obj.url,\
+    \      method: showVerb(obj.method),\
+    \      headers: headers,\
+    \      body: obj.body,\
+    \      cached: obj.cached,\
+    \      withCredentials: obj.withCredentials\
+    \    });\
     \  }\
-    \}" :: forall eff. OboeOptions -> Eff (oboe :: OboeEff | eff) Oboe
+    \}" :: forall eff
+        .  Fn3 (Header -> {head :: String, value :: String})
+               (Verb -> String)
+               OboeOptions
+               (Eff (oboe :: OboeEff | eff) Oboe)
+
+  oboe :: forall eff. OboeOptions -> Eff (oboe :: OboeEff | eff) Oboe
+  oboe opts = runFn3 oboe_ header2Obj showVerb opts
 
   type OboeOptions =
     { url :: String
@@ -162,6 +166,3 @@ module Network.Oboe
   header2Obj (Header head value) = {head: show head, value: value}
   showVerb :: Verb -> String
   showVerb = show
-  mkFn1_ = mkFn1
-  mkFn2_ = mkFn2
-  mkFn3_ = mkFn3
